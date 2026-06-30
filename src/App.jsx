@@ -19,7 +19,7 @@ import ProductDetail from "./pages/ProductDetail";
 
 // Carrito y checkout
 import Cart from "./pages/Cart";
-import Checkout from "./pages/checkout";
+import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import OrderCancel from "./pages/OrderCancel";
 import MyOrders from "./pages/MyOrders";
