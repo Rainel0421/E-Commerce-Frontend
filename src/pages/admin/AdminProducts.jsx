@@ -33,23 +33,189 @@ const emptyForm = {
 function StockBadge({ stock }) {
   if (stock === 0)
     return (
-      <span
-        className="inline-flex items-center px-2 py-0.5 rounded-full
-                       text-[11px] font-semibold bg-red-50 text-red-600"
-      >
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-red-50 text-red-600">
         Agotado
       </span>
     );
   if (stock <= 5)
     return (
-      <span
-        className="inline-flex items-center px-2 py-0.5 rounded-full
-                       text-[11px] font-semibold bg-amber-50 text-amber-600"
-      >
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-600">
         {stock} unid.
       </span>
     );
   return <span className="text-sm text-gray-700">{stock}</span>;
+}
+
+// ── Card de producto (móvil) ────────────────────────────
+
+function ProductCard({ product, onEdit, onDelete, confirmingId }) {
+  return (
+    <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+      {/* Imagen */}
+      <div className="w-full h-40 bg-gray-100 overflow-hidden flex items-center justify-center">
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <ImageOff className="w-8 h-8 text-gray-300" strokeWidth={1.5} />
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="p-4 space-y-3">
+        <div>
+          <p className="font-semibold text-gray-900 line-clamp-2">
+            {product.name}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {product.category?.name || "Sin categoría"}
+          </p>
+        </div>
+
+        {product.description && (
+          <p className="text-xs text-gray-600 line-clamp-2">
+            {product.description}
+          </p>
+        )}
+
+        {/* Precio y Stock */}
+        <div className="flex items-center justify-between py-3 border-t border-b border-gray-100">
+          <span className="text-lg font-bold text-gray-900">
+            ${Number(product.price).toFixed(2)}
+          </span>
+          <StockBadge stock={product.stock} />
+        </div>
+
+        {/* Acciones */}
+        {confirmingId === product.id ? (
+          <div className="flex gap-2">
+            <button
+              onClick={() => onDelete(product)}
+              className="flex-1 px-3 py-2 rounded-lg bg-red-500 text-white text-xs font-semibold
+                         hover:bg-red-600 active:scale-95 transition-all"
+            >
+              Confirmar
+            </button>
+            <button
+              onClick={() => onDelete(null)}
+              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold
+                         hover:bg-gray-50 active:scale-95 transition-all"
+            >
+              Cancelar
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={() => onEdit(product)}
+              className="flex-1 px-3 py-2 rounded-lg text-indigo-600 font-medium text-sm
+                         hover:bg-indigo-50 transition"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => onDelete(product.id)}
+              className="flex-1 px-3 py-2 rounded-lg text-red-600 font-medium text-sm
+                         hover:bg-red-50 transition"
+            >
+              Eliminar
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Fila de tabla (desktop) ────────────────────────────
+
+function ProductRow({ product, onEdit, onDelete, confirmingId }) {
+  return (
+    <tr className="hover:bg-gray-50/60 transition-colors">
+      {/* Thumbnail */}
+      <td className="px-5 py-4">
+        <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center flex-shrink-0">
+          {product.imageUrl ? (
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <ImageOff className="w-4 h-4 text-gray-300" strokeWidth={1.5} />
+          )}
+        </div>
+      </td>
+
+      {/* Nombre */}
+      <td className="px-5 py-4">
+        <span className="font-medium text-gray-900 line-clamp-1">
+          {product.name}
+        </span>
+      </td>
+
+      {/* Categoría */}
+      <td className="px-5 py-4 text-gray-400 hidden lg:table-cell text-sm">
+        {product.category?.name || "—"}
+      </td>
+
+      {/* Precio */}
+      <td className="px-5 py-4 font-semibold text-gray-900 text-sm">
+        ${Number(product.price).toFixed(2)}
+      </td>
+
+      {/* Stock */}
+      <td className="px-5 py-4">
+        <StockBadge stock={product.stock} />
+      </td>
+
+      {/* Acciones */}
+      <td className="px-5 py-4">
+        {confirmingId === product.id ? (
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => onDelete(product)}
+              className="px-2.5 py-1 rounded-lg bg-red-500 text-white text-xs font-semibold
+                         hover:bg-red-600 active:scale-95 transition-all"
+            >
+              Confirmar
+            </button>
+            <button
+              onClick={() => onDelete(null)}
+              className="px-2.5 py-1 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold
+                         hover:bg-gray-50 active:scale-95 transition-all"
+            >
+              No
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-0.5 justify-end">
+            <button
+              onClick={() => onEdit(product)}
+              aria-label={`Editar ${product.name}`}
+              className="w-8 h-8 flex items-center justify-center rounded-lg
+                         text-gray-400 hover:text-indigo-600 hover:bg-indigo-50
+                         transition"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => onDelete(product.id)}
+              aria-label={`Eliminar ${product.name}`}
+              className="w-8 h-8 flex items-center justify-center rounded-lg
+                         text-gray-400 hover:text-red-500 hover:bg-red-50
+                         transition"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+      </td>
+    </tr>
+  );
 }
 
 export default function AdminProducts() {
@@ -65,7 +231,7 @@ export default function AdminProducts() {
   const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
 
-  // Solo para recargar tras mutaciones — sin estado de carga
+  // Solo para recargar tras mutaciones
   const loadData = async () => {
     const [productsData, categoriesData] = await Promise.all([
       getProducts(),
@@ -75,7 +241,7 @@ export default function AdminProducts() {
     setCategories(categoriesData);
   };
 
-  // Carga inicial con cleanup para evitar actualizaciones en componente desmontado
+  // Carga inicial con cleanup
   useEffect(() => {
     let active = true;
     async function fetchData() {
@@ -143,7 +309,7 @@ export default function AdminProducts() {
       await loadData();
     } catch (err) {
       setFormError(
-        err.response?.data?.message || "Error al guardar el producto.",
+        err.response?.data?.message || "Error al guardar el producto."
       );
     } finally {
       setSubmitting(false);
@@ -151,6 +317,16 @@ export default function AdminProducts() {
   };
 
   const handleDelete = async (product) => {
+    if (typeof product === "number") {
+      setConfirmingDeleteId(product);
+      return;
+    }
+
+    if (product === null) {
+      setConfirmingDeleteId(null);
+      return;
+    }
+
     setDeleteError(null);
     try {
       await deleteProduct(product.id);
@@ -158,7 +334,7 @@ export default function AdminProducts() {
       await loadData();
     } catch (err) {
       setDeleteError(
-        err.response?.data?.message || "No se pudo eliminar el producto.",
+        err.response?.data?.message || "No se pudo eliminar el producto."
       );
       setConfirmingDeleteId(null);
     }
@@ -176,10 +352,7 @@ export default function AdminProducts() {
 
   if (error) {
     return (
-      <div
-        className="flex items-center gap-2 text-sm text-red-700
-                      bg-red-50 border border-red-100 rounded-xl px-4 py-3"
-      >
+      <div className="flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
         <AlertCircle className="w-4 h-4 flex-shrink-0" />
         {error}
       </div>
@@ -190,8 +363,8 @@ export default function AdminProducts() {
   return (
     <div className="space-y-6">
       {/* Encabezado */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
             <Package className="w-4 h-4 text-gray-600" />
           </div>
@@ -207,31 +380,28 @@ export default function AdminProducts() {
         </div>
         <button
           onClick={openCreateForm}
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl
-                     text-sm font-medium bg-gray-900 text-white
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5
+                     rounded-xl text-sm font-medium bg-gray-900 text-white
                      hover:bg-gray-700 active:scale-95 transition-all"
         >
           <Plus className="w-4 h-4" />
-          Nuevo producto
+          <span>Nuevo producto</span>
         </button>
       </div>
 
       {/* Error de eliminación */}
       {deleteError && (
-        <div
-          className="flex items-start gap-2.5 text-sm text-red-700
-                        bg-red-50 border border-red-100 rounded-xl px-4 py-3"
-        >
+        <div className="flex items-start gap-2.5 text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           {deleteError}
         </div>
       )}
 
-      {/* Tabla / empty state */}
+      {/* Vista móvil: Grid de cards */}
       {products.length === 0 ? (
         <div className="text-center py-20">
           <Package
-            className="w-10 h-10 mx-auto mb-3 text-gray-200"
+            className="w-12 h-12 mx-auto mb-3 text-gray-200"
             strokeWidth={1.5}
           />
           <p className="text-sm text-gray-400">
@@ -239,138 +409,63 @@ export default function AdminProducts() {
           </p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100">
-                <th className="w-12 px-4 py-3" />
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Nombre
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">
-                  Categoría
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Precio
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Stock
-                </th>
-                <th className="w-28 px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {products.map((p) => (
-                <tr
-                  key={p.id}
-                  className="hover:bg-gray-50/60 transition-colors"
-                >
-                  {/* Thumbnail */}
-                  <td className="px-4 py-3">
-                    <div
-                      className="w-9 h-9 rounded-lg overflow-hidden bg-gray-100
-                                    flex items-center justify-center flex-shrink-0"
-                    >
-                      {p.imageUrl ? (
-                        <img
-                          src={p.imageUrl}
-                          alt={p.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <ImageOff
-                          className="w-4 h-4 text-gray-300"
-                          strokeWidth={1.5}
-                        />
-                      )}
-                    </div>
-                  </td>
+        <>
+          {/* Mobile: Grid de cards */}
+          <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onEdit={openEditForm}
+                onDelete={handleDelete}
+                confirmingId={confirmingDeleteId}
+              />
+            ))}
+          </div>
 
-                  {/* Nombre */}
-                  <td className="px-4 py-3">
-                    <span className="font-medium text-gray-900 line-clamp-1">
-                      {p.name}
-                    </span>
-                  </td>
-
-                  {/* Categoría */}
-                  <td className="px-4 py-3 text-gray-400 hidden md:table-cell">
-                    {p.category?.name || "—"}
-                  </td>
-
-                  {/* Precio */}
-                  <td className="px-4 py-3 font-semibold text-gray-900">
-                    ${Number(p.price).toFixed(2)}
-                  </td>
-
-                  {/* Stock */}
-                  <td className="px-4 py-3">
-                    <StockBadge stock={p.stock} />
-                  </td>
-
-                  {/* Acciones */}
-                  <td className="px-4 py-3">
-                    {confirmingDeleteId === p.id ? (
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => handleDelete(p)}
-                          className="px-2.5 py-1 rounded-lg bg-red-500 text-white
-                                     text-xs font-semibold hover:bg-red-600
-                                     active:scale-95 transition-all"
-                        >
-                          Confirmar
-                        </button>
-                        <button
-                          onClick={() => setConfirmingDeleteId(null)}
-                          className="px-2.5 py-1 rounded-lg border border-gray-200
-                                     text-gray-600 text-xs font-semibold
-                                     hover:bg-gray-50 active:scale-95 transition-all"
-                        >
-                          No
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-0.5 justify-end">
-                        <button
-                          onClick={() => openEditForm(p)}
-                          aria-label={`Editar ${p.name}`}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg
-                                     text-gray-400 hover:text-indigo-600 hover:bg-indigo-50
-                                     transition"
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => setConfirmingDeleteId(p.id)}
-                          aria-label={`Eliminar ${p.name}`}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg
-                                     text-gray-400 hover:text-red-500 hover:bg-red-50
-                                     transition"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    )}
-                  </td>
+          {/* Desktop: Tabla */}
+          <div className="hidden md:block bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="w-12 px-5 py-3" />
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Nombre
+                  </th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden lg:table-cell">
+                    Categoría
+                  </th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Precio
+                  </th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Stock
+                  </th>
+                  <th className="w-28 px-5 py-3" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {products.map((p) => (
+                  <ProductRow
+                    key={p.id}
+                    product={p}
+                    onEdit={openEditForm}
+                    onDelete={handleDelete}
+                    confirmingId={confirmingDeleteId}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {/* ── Modal crear / editar ──────────────────────────── */}
       {showForm && (
-        <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-[2px]
-                        flex items-center justify-center p-4 z-50"
-        >
-          <div
-            className="bg-white rounded-2xl w-full max-w-md
-                          max-h-[90vh] overflow-y-auto shadow-2xl"
-          >
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
             {/* Header del modal */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+            <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-gray-100">
               <h2 className="text-base font-semibold text-gray-900">
                 {editingId ? "Editar producto" : "Nuevo producto"}
               </h2>
@@ -385,7 +480,7 @@ export default function AdminProducts() {
             </div>
 
             {/* Formulario */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               {/* Nombre */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -423,7 +518,7 @@ export default function AdminProducts() {
               </div>
 
               {/* Precio + Stock */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                     Precio
@@ -513,7 +608,7 @@ export default function AdminProducts() {
               )}
 
               {/* Botones */}
-              <div className="flex gap-2 pt-2">
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}

@@ -44,7 +44,9 @@ export default function AdminCategories() {
       }
     }
     fetchCategories();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
   const handleSubmit = async (e) => {
@@ -76,7 +78,7 @@ export default function AdminCategories() {
     } catch (err) {
       setDeleteError(
         err.response?.data?.message ||
-          "No se pudo eliminar (puede tener productos asociados).",
+          "No se pudo eliminar (puede tener productos asociados)."
       );
       setConfirmingDeleteId(null);
     }
@@ -107,8 +109,7 @@ export default function AdminCategories() {
 
   // ── Vista principal ──────────────────────────────────────
   return (
-    <div className="max-w-2xl space-y-6">
-
+    <div className="w-full space-y-6">
       {/* Encabezado */}
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -126,12 +127,12 @@ export default function AdminCategories() {
       </div>
 
       {/* Formulario */}
-      <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+      <div className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-5 shadow-sm">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
           {editingId ? "Editar categoría" : "Nueva categoría"}
         </p>
 
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -145,11 +146,11 @@ export default function AdminCategories() {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl
                        text-sm font-medium bg-gray-900 text-white
                        hover:bg-gray-700 active:scale-95
                        disabled:opacity-50 disabled:cursor-not-allowed
-                       transition-all"
+                       transition-all w-full sm:w-auto"
           >
             {submitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -166,7 +167,7 @@ export default function AdminCategories() {
               type="button"
               onClick={handleCancelEdit}
               aria-label="Cancelar edición"
-              className="w-10 h-10 flex items-center justify-center rounded-xl
+              className="w-full sm:w-10 h-10 flex items-center justify-center rounded-xl
                          border border-gray-200 text-gray-400
                          hover:text-gray-700 hover:bg-gray-50
                          active:scale-95 transition-all"
@@ -184,7 +185,7 @@ export default function AdminCategories() {
         )}
       </div>
 
-      {/* Error de eliminación (fuera del formulario) */}
+      {/* Error de eliminación */}
       {deleteError && (
         <div className="flex items-start gap-2.5 text-sm text-red-700
                         bg-red-50 border border-red-100 rounded-xl px-4 py-3">
@@ -202,12 +203,12 @@ export default function AdminCategories() {
           </p>
         </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-2 sm:space-y-3">
           {categories.map((c) => (
             <li
               key={c.id}
-              className={`flex items-center justify-between px-4 py-3 rounded-xl border
-                          transition-all duration-150
+              className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0
+                          px-4 py-3 rounded-xl border transition-all duration-150
                           ${editingId === c.id
                             ? "border-indigo-200 bg-indigo-50/40"
                             : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm"
@@ -225,28 +226,30 @@ export default function AdminCategories() {
                 </span>
               </div>
 
-              {/* Confirmación inline — sin window.confirm */}
+              {/* Acciones */}
               {confirmingDeleteId === c.id ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">¿Eliminar?</span>
-                  <button
-                    onClick={() => handleDelete(c)}
-                    className="px-2.5 py-1 rounded-lg bg-red-500 text-white
-                               text-xs font-semibold hover:bg-red-600 active:scale-95 transition-all"
-                  >
-                    Confirmar
-                  </button>
-                  <button
-                    onClick={() => setConfirmingDeleteId(null)}
-                    className="px-2.5 py-1 rounded-lg border border-gray-200 text-gray-600
-                               text-xs font-semibold hover:bg-gray-50 active:scale-95 transition-all"
-                  >
-                    Cancelar
-                  </button>
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <span className="text-xs text-gray-400 hidden sm:inline">¿Eliminar?</span>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <button
+                      onClick={() => handleDelete(c)}
+                      className="flex-1 sm:flex-none px-3 sm:px-2.5 py-2 sm:py-1 rounded-lg bg-red-500 text-white
+                                 text-xs font-semibold hover:bg-red-600 active:scale-95 transition-all"
+                    >
+                      Confirmar
+                    </button>
+                    <button
+                      onClick={() => setConfirmingDeleteId(null)}
+                      className="flex-1 sm:flex-none px-3 sm:px-2.5 py-2 sm:py-1 rounded-lg border border-gray-200
+                                 text-gray-600 text-xs font-semibold hover:bg-gray-50 active:scale-95 transition-all"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* Acciones normales */
-                <div className="flex items-center gap-0.5 flex-shrink-0">
+                <div className="flex items-center gap-0.5 flex-shrink-0 w-full sm:w-auto justify-end">
                   <button
                     onClick={() => handleStartEdit(c)}
                     aria-label={`Editar ${c.name}`}
